@@ -1,31 +1,26 @@
-// components.js
-console.log("components.js loaded");
-
-// This script dynamically loads components like navigation and footer into the main HTML document.
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener('DOMContentLoaded', () => {
   const components = [
-    { selector: "#nav-container", path: "../../components/nav.html" },
-    { selector: "#footer-container", path: "../../components/footer.html" }
+    { selector: '#nav-container',    path: '../../components/nav.html' },
+    { selector: '#footer-container', path: '../../components/footer.html' },
   ];
 
   components.forEach(component => {
     const container = document.querySelector(component.selector);
+    if (!container) return;
 
-    if (container) {
-      fetch(component.path)
-        .then(response => response.text())
-        .then(data => {
-          container.innerHTML = data;
+    fetch(component.path)
+      .then(r => r.text())
+      .then(html => {
+        container.innerHTML = html;
 
-          // Ensure the sticky class is applied after loading
-          const nav = container.querySelector(".sticky");
-          if (nav) {
-            nav.classList.add("top-0");
-          }
-        })
-        .catch(error => console.error(`Error loading ${component.path}:`, error));
-    }
+        // (optional) your sticky tweak
+        const nav = container.querySelector('.sticky');
+        if (nav) nav.classList.add('top-0');
+
+        // 🔔 tell the rest of the app that this component is ready
+        const name = component.selector === '#nav-container' ? 'nav:ready' : 'component:ready';
+        document.dispatchEvent(new Event(name));
+      })
+      .catch(err => console.error(`Error loading ${component.path}:`, err));
   });
 });
-
-
